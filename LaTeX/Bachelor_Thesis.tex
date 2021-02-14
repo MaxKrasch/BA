@@ -1,0 +1,71 @@
+% Possible types of documents/theses
+%   doctype=bachelorsthesis
+%   doctype=mastersthesis
+%   doctype=idp
+%   doctype=phdthesis
+%   doctype=studienarbeit
+%   doctype=diplomarbeit
+%
+% Document language
+%   without 'lang' attribute: English
+%   lang=ngerman:             German (new orthography)
+%
+% Binding correction
+%   BCOR=<Längenangabe>
+%   Additional margin, which is invisible due to binding the book
+%   The usual binding by the Fachschaft has a thickness of 1,5 cm 
+%
+% biblatex (citations)
+%   This requires 'biber' to be used instead of 'bibtex', please
+%   adapt your editor's settings accordingly!
+\documentclass[doctype=bachelorsthesis,lang=english,BCOR=15mm,bibtex]{ldvbook}
+
+
+% Packages
+\usepackage{import}   % Pictures
+\usepackage{lipsum}             % Blindtext
+
+% Look for citation sources in the database "diplomarbeit.bib"
+\addbibresource{other/bibliography.bib}
+% This is needed until Sharelatex includes biblatex > 3.7
+\NewBibliographyString{bathesis}
+
+% Settings
+\def\mytitle{Performance Improvement of Reinforcement Agents in Real World Simulation Environments by Reward Engineering}
+\def\myauthor{Maximilian Krähschütz}
+\hypersetup{pdfauthor=\myauthor,pdftitle=\mytitle}
+\graphicspath{{./img/}}_{}
+
+\renewcommand*{\figureformat}{%
+	\figurename~\thefigure%
+	%  \autodot% DELETED
+}
+
+\begin{document}
+	
+	% Information
+	\title{\mytitle}
+	\author{\myauthor}
+	\date{29. March 2021}
+	\supervisor{Supervisor}
+	\license{CC-BY}
+	
+	% Title
+	\maketitle[frontcover=Design1]
+	
+	% Chapters
+	\input{chapters/abstract}
+	\tableofcontents
+	\input{chapters/introduction}
+	\input{chapters/related_work}
+	\input{chapters/implementation}
+	\input{chapters/analysis}
+	\input{chapters/conclusion}
+	
+	% Puts out the list of references
+	\bibliography{other/bibliography}
+	
+	% Appendix always after the Bibliography
+	%\input{chapters/appendix}
+	
+\end{document}

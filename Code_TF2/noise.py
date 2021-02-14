@@ -16,3 +16,4 @@ class NormalActionNoise(ActionNoise):
 
     def __repr__(self):
         return 'NormalActionNoise(mu={}, sigma={})'.format(self.mean, self.sigma)
+

@@ -6,6 +6,7 @@ from keras_networks import ActorNN, CriticNN
 import tensorflow as tf
 from replay_buffer import ReplayBuffer
 from noise import NormalActionNoise
+import matplotlib.pyplot as plt
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -35,6 +36,8 @@ def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
 
 def ddpg(episode):
     env = gym.make('Walker2d-v3')
+    cumulus_steps = 0
+    episode_steps = 0
 
     # randomly initialize critics and actor with weights and biases
     q1 = CriticNN()
@@ -86,7 +89,7 @@ def ddpg(episode):
             replay_buffer.store_transition(state, action, reward, next_state, done)
 
             # if there are enough transitions in the replay buffer
-            batch_size = 64
+            batch_size = 100
             if replay_buffer.mem_cntr >= batch_size:
 
                 # sample a random mini batch of n=64 transitions
@@ -146,19 +149,27 @@ def ddpg(episode):
                     update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, 0.005)
 
             if done:
-                print("episode: {}/{}, score: {}".format(e, episode, score))
+                performance.append(score)
+                avg_reward = np.mean(performance[-10:])
+                cumulus_steps += i
+                print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
+                      .format(e, episode, score, avg_reward, i, cumulus_steps))
                 break
 
             score += reward
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
 
-        print("episode: {}/{}, score: {}".format(e, episode, score))
-        performance.append(score)
     return performance
 
 
 # main starts
-episodes = 400
+episodes = 500000
 overall_performance = ddpg(episodes)
 
 # plot performance
+plt.plot(range(len(overall_performance)), overall_performance, 'b')
+plt.title("Avg Test Aeward Vs Test Episods")
+plt.xlabel("Test Episods")
+plt.ylabel("Average Test Reward")
+plt.grid(True)
+plt.show()

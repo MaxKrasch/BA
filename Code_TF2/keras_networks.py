@@ -39,3 +39,4 @@ class CriticNN(keras.Model):
         q = self.q(action_value)
 
         return q
+

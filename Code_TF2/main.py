@@ -86,6 +86,9 @@ def ddpg(episode, breaking_step, reward_name):
             # select an action a_t = mu(state) + noise
             noise = NormalActionNoise(0, 0.1)
             action = mu(state) + np.random.normal(noise.mean, noise.sigma)
+            proto_tensor = tf.make_tensor_proto(action)
+            action = tf.make_ndarray(proto_tensor)
+            action = action[0]
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)

@@ -165,7 +165,7 @@ def ddpg(episode, breaking_step, reward_name):
                 print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
 
-                if 10000 < cumulus_steps < 11000:
+                if 500000 < cumulus_steps < 501000:
                     if not os.path.exists("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name)):
                         os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name))
                     q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
@@ -180,6 +180,8 @@ def ddpg(episode, breaking_step, reward_name):
                                     "Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
                     mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
                                            "Models/Ant_v2/{}/mut{}.h5".format(reward_name, cumulus_steps))
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
+                            "Models/Ant_v2/{}/array{}".format(reward_name, cumulus_steps), avg_return)
                 break
 
             score += reward
@@ -216,7 +218,7 @@ def test(mu_render, e, train_bool, weight_string):
 
 # main starts
 train = True
-break_step = 11000
+break_step = 502000
 agent_weights = "none"
 
 if not train:

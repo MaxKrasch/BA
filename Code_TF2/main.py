@@ -7,6 +7,9 @@ import tensorflow as tf
 from replay_buffer import ReplayBuffer
 from noise import NormalActionNoise
 import matplotlib.pyplot as plt
+import sys
+
+reward_fcn_name = sys.argv[0]
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -34,7 +37,7 @@ def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
     return q1_target, q2_target, mu_target
 
 
-def ddpg(episode, breaking_step):
+def ddpg(episode, breaking_step, reward_name):
     env = gym.make('Ant-v2')
     cumulus_steps = 0
     episode_steps = 0
@@ -157,19 +160,19 @@ def ddpg(episode, breaking_step):
                 print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
 
-                if 500000 < cumulus_steps < 501000:
-                    q1.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
-                                    "BA_Luca_Rep/BA/Models/default/q1_Ant_default{}".format(cumulus_steps))
-                    q2.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
-                                    "BA_Luca_Rep/BA/Models/default/q2_Ant_default{}".format(cumulus_steps))
-                    q1_target.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
-                                           "BA_Luca_Rep/BA/Models/default/q1_target_Ant_default{}".format(cumulus_steps))
-                    q2_target.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
-                                           "BA_Luca_Rep/BA/Models/default/q2_target_Ant_default{}".format(cumulus_steps))
-                    mu.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
-                                    "BA_Luca_Rep/BA/Models/default/mu_Ant_default{}".format(cumulus_steps))
-                    mu_target.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
-                                           "BA_Luca_Rep/BA/Models/default/mu_target_Ant_default{}".format(cumulus_steps))
+                if 10000 < cumulus_steps < 11000:
+                    q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
+                                    "Models/Ant_v2/{}/q1{}".format(reward_name, cumulus_steps))
+                    q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
+                                    "Models/Ant_v2/{}/q2{}".format(reward_name, cumulus_steps))
+                    q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
+                                           "Models/Ant_v2/{}/q1t{}".format(reward_name, cumulus_steps))
+                    q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
+                                           "Models/Ant_v2/{}/q2t{}".format(reward_name, cumulus_steps))
+                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
+                                    "Models/Ant_v2/{}/mu{}".format(reward_name, cumulus_steps))
+                    mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
+                                           "Models/Ant_v2/{}/mut{}".format(reward_name, cumulus_steps))
                 break
 
             score += reward
@@ -206,7 +209,7 @@ def test(mu_render, e, train_bool, weight_string):
 
 # main starts
 train = True
-break_step = 502000
+break_step = 11000
 agent_weights = "none"
 
 if not train:
@@ -214,16 +217,20 @@ if not train:
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/default_r/mu_5497.h5"
 
 episodes = 500000
-overall_performance, mu = ddpg(episodes, break_step)
+overall_performance, mu = ddpg(episodes, break_step, reward_fcn_name)
 
 # plot performance
-plt.plot(range(len(overall_performance)), overall_performance, 'b')
-plt.title("Avg Test Reward Vs Test Episodes")
-plt.xlabel("Test Episodes")
-plt.ylabel("Average Test Reward")
-plt.grid(True)
-plt.show()
+if train:
+    figure = plt.plot(range(len(overall_performance)), overall_performance, 'b')
+    plt.title("Avg Test Reward Vs Test Episodes")
+    plt.xlabel("Test Episodes")
+    plt.ylabel("Average Test Reward")
+    plt.grid(True)
+    # plt.show()
+    figure.savefig("/home/ga53cov/Bachelor_Arbeit/BA/"
+                   "Models/Ant_v2/{}/figure.pdf".format(reward_fcn_name), bbox_inches='tight')
 
 # test and render
 eps = 20
-test(mu, eps, train, agent_weights)
+if not train:
+    test(mu, eps, train, agent_weights)

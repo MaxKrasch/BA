@@ -8,9 +8,10 @@ from replay_buffer import ReplayBuffer
 from noise import NormalActionNoise
 import matplotlib.pyplot as plt
 import sys
+import os
 import pybulletgym
 
-reward_fcn_name = sys.argv[0]
+reward_fcn_name = sys.argv[1]
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -165,18 +166,20 @@ def ddpg(episode, breaking_step, reward_name):
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
 
                 if 10000 < cumulus_steps < 11000:
+                    if not os.path.exists("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name)):
+                        os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name))
                     q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/q1{}".format(reward_name, cumulus_steps))
+                                    "Models/Ant_v2/{}/q1{}.h5".format(reward_name, cumulus_steps))
                     q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/q2{}".format(reward_name, cumulus_steps))
+                                    "Models/Ant_v2/{}/q2{}.h5".format(reward_name, cumulus_steps))
                     q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/q1t{}".format(reward_name, cumulus_steps))
+                                           "Models/Ant_v2/{}/q1t{}.h5".format(reward_name, cumulus_steps))
                     q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/q2t{}".format(reward_name, cumulus_steps))
+                                           "Models/Ant_v2/{}/q2t{}.h5".format(reward_name, cumulus_steps))
                     mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/mu{}".format(reward_name, cumulus_steps))
+                                    "Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
                     mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/mut{}".format(reward_name, cumulus_steps))
+                                           "Models/Ant_v2/{}/mut{}.h5".format(reward_name, cumulus_steps))
                 break
 
             score += reward
@@ -225,14 +228,14 @@ overall_performance, mu = ddpg(episodes, break_step, reward_fcn_name)
 
 # plot performance
 if train:
-    figure = plt.plot(range(len(overall_performance)), overall_performance, 'b')
+    plt.plot(range(len(overall_performance)), overall_performance, 'b')
     plt.title("Avg Test Reward Vs Test Episodes")
     plt.xlabel("Test Episodes")
     plt.ylabel("Average Test Reward")
     plt.grid(True)
     # plt.show()
-    figure.savefig("/home/ga53cov/Bachelor_Arbeit/BA/"
-                   "Models/Ant_v2/{}/figure.pdf".format(reward_fcn_name), bbox_inches='tight')
+    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/"
+                "Models/Ant_v2/{}/figure.pdf".format(reward_fcn_name), bbox_inches='tight')
 
 # test and render
 eps = 20

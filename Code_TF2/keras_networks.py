@@ -2,7 +2,6 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.layers import Dense
 
-
 class ActorNN(keras.Model):
     def __init__(self, n_actions, fc1_dims=400, fc2_dims=300):
         super(ActorNN, self).__init__()

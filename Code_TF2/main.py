@@ -34,8 +34,8 @@ def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
     return q1_target, q2_target, mu_target
 
 
-def ddpg(episode):
-    env = gym.make('Walker2d-v3')
+def ddpg(episode, breaking_step):
+    env = gym.make('Ant-v2')
     cumulus_steps = 0
     episode_steps = 0
 
@@ -64,6 +64,7 @@ def ddpg(episode):
     replay_buffer = ReplayBuffer(1000000, env.observation_space.shape[0], env.action_space.shape[0])
 
     performance = []
+    avg_return = []
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
@@ -151,25 +152,78 @@ def ddpg(episode):
             if done:
                 performance.append(score)
                 avg_reward = np.mean(performance[-10:])
+                avg_return.append(avg_reward)
                 cumulus_steps += i
                 print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
+
+                if 500000 < cumulus_steps < 501000:
+                    q1.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
+                                    "BA_Luca_Rep/BA/Models/default/q1_Ant_default{}".format(cumulus_steps))
+                    q2.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
+                                    "BA_Luca_Rep/BA/Models/default/q2_Ant_default{}".format(cumulus_steps))
+                    q1_target.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
+                                           "BA_Luca_Rep/BA/Models/default/q1_target_Ant_default{}".format(cumulus_steps))
+                    q2_target.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
+                                           "BA_Luca_Rep/BA/Models/default/q2_target_Ant_default{}".format(cumulus_steps))
+                    mu.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
+                                    "BA_Luca_Rep/BA/Models/default/mu_Ant_default{}".format(cumulus_steps))
+                    mu_target.save_weights("/Users/maxi/Desktop/Bachelor_Arbeit/"
+                                           "BA_Luca_Rep/BA/Models/default/mu_target_Ant_default{}".format(cumulus_steps))
                 break
 
             score += reward
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
 
-    return performance
+        # stop learning after certain time steps
+        if cumulus_steps > breaking_step:
+            break
+
+    return avg_return, mu
+
+
+def test(mu_render, e, train_bool, weight_string):
+    env = gym.make("Ant-v2")
+    if not train_bool:
+        mu_render.load_weights(weight_string)
+
+    for i in range(e):
+        observation = env.reset()
+        state = tf.convert_to_tensor([observation], dtype=tf.float32)
+        done = 0
+        ep_reward = 0
+        step = 0
+        while not done:
+            env.render()
+            action = mu_render(state)
+            next_state, reward, done, _ = env.step(action)
+            state = tf.convert_to_tensor([next_state], dtype=tf.float32)
+            ep_reward += reward
+            step += 1
+        print(ep_reward)
+        print(step)
 
 
 # main starts
+train = True
+break_step = 502000
+agent_weights = "none"
+
+if not train:
+    break_step = 2000
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/default_r/mu_5497.h5"
+
 episodes = 500000
-overall_performance = ddpg(episodes)
+overall_performance, mu = ddpg(episodes, break_step)
 
 # plot performance
 plt.plot(range(len(overall_performance)), overall_performance, 'b')
-plt.title("Avg Test Aeward Vs Test Episods")
-plt.xlabel("Test Episods")
+plt.title("Avg Test Reward Vs Test Episodes")
+plt.xlabel("Test Episodes")
 plt.ylabel("Average Test Reward")
 plt.grid(True)
 plt.show()
+
+# test and render
+eps = 20
+test(mu, eps, train, agent_weights)

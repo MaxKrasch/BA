@@ -8,6 +8,7 @@ from replay_buffer import ReplayBuffer
 from noise import NormalActionNoise
 import matplotlib.pyplot as plt
 import sys
+import pybulletgym
 
 reward_fcn_name = sys.argv[0]
 
@@ -38,7 +39,7 @@ def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
 
 
 def ddpg(episode, breaking_step, reward_name):
-    env = gym.make('Ant-v2')
+    env = gym.make('AntPyBulletEnv-v0')
     cumulus_steps = 0
     episode_steps = 0
 

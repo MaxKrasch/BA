@@ -12,6 +12,7 @@ import os
 import pybulletgym
 
 reward_fcn_name = sys.argv[1]
+# reward_fcn_name = "ok"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -92,7 +93,7 @@ def ddpg(episode, breaking_step, reward_name):
             action = action[0]
 
             # execute action a_t and observe reward, and next state
-            next_state, reward, done, reward_things, _ = env.step(action)
+            next_state, reward, done, _ = env.step(action)
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

@@ -9,6 +9,10 @@ from sklearn.utils import shuffle
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow import keras
 import pybulletgym
+import pybullet
 
-env = gym.make('Ant-v2')
+
+env = gym.make("AntPyBulletEnv-v0")
+
+
 

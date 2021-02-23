@@ -12,6 +12,7 @@ import os
 import pybulletgym
 
 reward_fcn_name = sys.argv[1]
+# reward_fcn_name = "test"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -93,6 +94,18 @@ def ddpg(episode, breaking_step, reward_name):
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, reward_things, _ = env.step(action)
+            # alive + progress + joint_limit + feet_collision
+            reward = reward_things[0] + reward_things[1] + reward_things[3] + reward_things[4]
+            # alive = float(self.robot.alive_bonus(state[0] + self.robot.initial_z, self.robot.body_rpy[1]))
+            # potential_old = self.potential
+            # self.potential = self.robot.calc_potential()
+            # progress = float(self.potential - potential_old)
+            # electricity_cost = self.electricity_cost * float(np.abs(
+            #     a * self.robot.joint_speeds).mean())  # let's assume we have DC motor
+            #     with controller, and reverse current braking
+            # electricity_cost += self.stall_torque_cost * float(np.square(a).mean())
+            # joints_at_limit_cost = float(self.joints_at_limit_cost * self.robot.joints_at_limit)
+            # feet_collision_cost = 0.0
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

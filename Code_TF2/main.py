@@ -205,6 +205,7 @@ def ddpg(episode, breaking_step, reward_name, l_data, l_count):
 
                 if 50000 < cumulus_steps < 51000:
                     if not os.path.exists("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name)):
+                        os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name))
                         os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/{}".format(reward_name, cumulus_steps))
                     q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
                                     "Models/Ant_v2/{}/{}/q1.h5".format(reward_name, cumulus_steps))

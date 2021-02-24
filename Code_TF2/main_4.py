@@ -93,7 +93,7 @@ def ddpg(episode, breaking_step, reward_name):
             action = action[0]
 
             # execute action a_t and observe reward, and next state
-            next_state, reward, done, reward_things, _ = env.step(action)
+            next_state, reward, done,  _ = env.step(action)
             reward_things = env.env.rewards
             reward = reward_things[0] + reward_things[1] + reward_things[3]   # alive + progress + joint_limit
 

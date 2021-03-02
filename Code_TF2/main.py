@@ -11,17 +11,7 @@ import sys
 import os
 import pybulletgym
 
-load_data = False
-load_count = None
-
-reward_fcn_name = sys.argv[1]
-if len(sys.argv) >= 3:
-    load_data = True
-    load_count = sys.argv[2]
-else:
-    print("No loading needed")
-
-# reward_fcn_name = "ok"
+reward_fcn_name = "pybullet_normal_mio"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -49,7 +39,7 @@ def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
     return q1_target, q2_target, mu_target
 
 
-def ddpg(episode, breaking_step, reward_name, l_data, l_count):
+def ddpg(episode, breaking_step, reward_name):
     env = gym.make('AntPyBulletEnv-v0')
     cumulus_steps = 0
     episode_steps = 0
@@ -80,35 +70,9 @@ def ddpg(episode, breaking_step, reward_name, l_data, l_count):
 
     performance = []
     avg_return = []
+    time_step_reward = []
+    avg_time_step_reward = []
     for e in range(episode):
-
-        if cumulus_steps > 2000 and l_data:
-            l_data = False
-            cumulus_steps += l_count
-            q1.load_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/q1.h5".format(reward_name, l_count))
-            q2.load_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/q2.h5".format(reward_name, l_count))
-            q1_target.load_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                   "Models/Ant_v2/{}/{}/q1t.h5".format(reward_name, l_count))
-            q2_target.load_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                   "Models/Ant_v2/{}/{}/q2t.h5".format(reward_name, l_count))
-            mu.load_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/mu.h5".format(reward_name, l_count))
-            mu_target.load_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                   "Models/Ant_v2/{}/{}/mut.h5".format(reward_name, l_count))
-            avg_return = np.load("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                 "Models/Ant_v2/{}/{}/array".format(reward_name, cumulus_steps))
-            replay_buffer.state_memory = np.load("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                                 "Models/Ant_v2/{}/{}/state_memory".format(reward_name, cumulus_steps))
-            replay_buffer.new_state_memory = np.load("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                                     "Models/Ant_v2/{}/{}/new_state_memory".format(reward_name, cumulus_steps))
-            replay_buffer.action_memory = np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                                  "Models/Ant_v2/{}/{}/action_memory".format(reward_name, cumulus_steps))
-            replay_buffer.reward_memory = np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                                  "Models/Ant_v2/{}/{}/reward_memory".format(reward_name, cumulus_steps))
-            replay_buffer.terminal_memory = np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                                    "Models/Ant_v2/{}/{}/terminal_memory".format(reward_name, cumulus_steps))
 
         # receive initial observation state s1 (observation = s1)
         observation = env.reset()
@@ -195,42 +159,30 @@ def ddpg(episode, breaking_step, reward_name, l_data, l_count):
                     # update the target networks
                     update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, 0.005)
 
+            time_step_reward.append(reward)
+            avg_time_step_reward_short = np.mean(time_step_reward[-25:])
+            avg_time_step_reward.append(avg_time_step_reward_short)
             if done:
                 performance.append(score)
-                avg_reward = np.mean(performance[-10:])
+                avg_reward = np.mean(performance[-25:])
                 avg_return.append(avg_reward)
                 cumulus_steps += i
                 print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
 
-                if 50000 < cumulus_steps < 51000:
+                if 1000000 < cumulus_steps < 1001000:
                     if not os.path.exists("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name)):
                         os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name))
-                        os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/{}".format(reward_name, cumulus_steps))
-                    q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/{}/q1.h5".format(reward_name, cumulus_steps))
-                    q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/{}/q2.h5".format(reward_name, cumulus_steps))
-                    q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/{}/q1t.h5".format(reward_name, cumulus_steps))
-                    q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/{}/q2t.h5".format(reward_name, cumulus_steps))
-                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/{}/mu.h5".format(reward_name, cumulus_steps))
-                    mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/{}/mut.h5".format(reward_name, cumulus_steps))
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/array".format(reward_name, cumulus_steps), avg_return)
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/state_memory".format(reward_name, cumulus_steps), replay_buffer.state_memory)
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/new_state_memory".format(reward_name, cumulus_steps), replay_buffer.new_state_memory)
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/action_memory".format(reward_name, cumulus_steps), replay_buffer.action_memory)
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/reward_memory".format(reward_name, cumulus_steps), replay_buffer.reward_memory)
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/{}/terminal_memory".format(reward_name, cumulus_steps), replay_buffer.terminal_memory)
+                    q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1{}.h5".format(reward_name, cumulus_steps))
+                    q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2{}.h5".format(reward_name, cumulus_steps))
+                    q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1t{}.h5".format(reward_name, cumulus_steps))
+                    q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2t{}.h5".format(reward_name, cumulus_steps))
+                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
+                    mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mut{}.h5".format(reward_name, cumulus_steps))
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_return{}".format(reward_name, cumulus_steps), avg_return)
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/time_step_reward{}".format(reward_name, cumulus_steps), time_step_reward)
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/performance{}".format(reward_name, cumulus_steps), performance)
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_time_step_reward{}".format(reward_name, cumulus_steps), avg_time_step_reward)
                 break
 
             score += reward
@@ -240,23 +192,26 @@ def ddpg(episode, breaking_step, reward_name, l_data, l_count):
         if cumulus_steps > breaking_step:
             break
 
-    return avg_return, mu
+    return avg_return, mu, performance, time_step_reward, avg_time_step_reward
 
 
 def test(mu_render, e, train_bool, weight_string):
-    env = gym.make("Ant-v2")
+    env = gym.make('AntPyBulletEnv-v0')
     if not train_bool:
         mu_render.load_weights(weight_string)
 
     for i in range(e):
-        observation = env.reset()
-        state = tf.convert_to_tensor([observation], dtype=tf.float32)
         done = 0
         ep_reward = 0
         step = 0
+        env.render()
+        observation = env.reset()
+        state = tf.convert_to_tensor([observation], dtype=tf.float32)
         while not done:
-            env.render()
             action = mu_render(state)
+            proto_tensor = tf.make_tensor_proto(action)
+            action = tf.make_ndarray(proto_tensor)
+            action = action[0]
             next_state, reward, done, _ = env.step(action)
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
             ep_reward += reward
@@ -267,26 +222,36 @@ def test(mu_render, e, train_bool, weight_string):
 
 # main starts
 train = True
-break_step = 52000
+break_step = 5000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/default_r/mu_5497.h5"
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2/normal_neu/mu500634.h5"
 
 episodes = 500000
-overall_performance, mu = ddpg(episodes, break_step, reward_fcn_name, load_data, load_count)
+overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)
 
 # plot performance
 if train:
-    plt.plot(range(len(overall_performance)), overall_performance, 'b')
-    plt.title("Avg Test Reward Vs Test Episodes")
-    plt.xlabel("Test Episodes")
-    plt.ylabel("Average Test Reward")
+    fig, ax = plt.subplots()
+    ax.plot(range(len(overall_performance)), overall_performance, color='r')
+    ax.plot(range(len(per)), per, 'b')
+    plt.xlabel("Episodes")
+    plt.ylabel("Performance")
     plt.grid(True)
-    # plt.show()
-    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/"
-                "Models/Ant_v2/{}/figure.pdf".format(reward_fcn_name), bbox_inches='tight')
+    plt.show()
+    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/figure1.pdf".format(reward_fcn_name),
+                bbox_inches='tight')
+    fig2, ax2 = plt.subplots()
+    ax2.plot(range(len(time_step_rew)), time_step_rew, color='y')
+    ax2.plot(range(len(avg_time_step_rew)), avg_time_step_rew, 'b')
+    plt.xlabel("Time Steps")
+    plt.ylabel("Performance")
+    plt.grid(True)
+    plt.show()
+    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/figure2.pdf".format(reward_fcn_name),
+                bbox_inches='tight')
 
 # test and render
 eps = 20

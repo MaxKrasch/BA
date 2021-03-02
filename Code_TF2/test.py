@@ -12,7 +12,16 @@ import pybulletgym
 import pybullet
 
 
-env = gym.make("AntPyBulletEnv-v0")
+# env = gym.make("AntPyBulletEnv-v0")
+
+a = 39
+b = "100"
+c = int(b)
+d = a + c
+
+
+
+print(d)
 
 
 

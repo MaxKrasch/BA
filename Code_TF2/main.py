@@ -240,7 +240,7 @@ if train:
     plt.xlabel("Episodes")
     plt.ylabel("Performance")
     plt.grid(True)
-    plt.show()
+    # plt.show()
     plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/figure1.pdf".format(reward_fcn_name),
                 bbox_inches='tight')
     fig2, ax2 = plt.subplots()
@@ -249,7 +249,7 @@ if train:
     plt.xlabel("Time Steps")
     plt.ylabel("Performance")
     plt.grid(True)
-    plt.show()
+    # plt.show()
     plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/figure2.pdf".format(reward_fcn_name),
                 bbox_inches='tight')
 

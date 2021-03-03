@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pybullet_normal_mio_2"
+reward_fcn_name = "pybullet_normal_mio"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -221,13 +221,13 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = True
-break_step = 1002000
+train = False
+break_step = 2000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2/normal_neu/mu500634.h5"
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/pybullet_normal_mio/mu1000199.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

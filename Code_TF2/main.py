@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pybullet_normal_mio_2"
+reward_fcn_name = "pybullet_hip_mio_p14m10p08m12"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -75,6 +75,7 @@ def ddpg(episode, breaking_step, reward_name):
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
+        # env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
 
@@ -92,9 +93,11 @@ def ddpg(episode, breaking_step, reward_name):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
+            # action = np.array([1, 0, -1, 0, 1, 0, -1, 0])
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
+            reward = reward + 0.1 * ((next_state[14]) - (next_state[10])) + 0.1 * ((next_state[8]) - (next_state[12]))
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -170,9 +173,13 @@ def ddpg(episode, breaking_step, reward_name):
                 print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
 
-                if 1000000 < cumulus_steps < 1001000:
+                if 50000 < cumulus_steps < 51000 or 150000 < cumulus_steps < 151000 or 350000 < cumulus_steps < 351000 \
+                        or 550000 < cumulus_steps < 551000 or 750000 < cumulus_steps < 751000:
                     if not os.path.exists("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name)):
                         os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name))
+                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
+
+                if 1000000 < cumulus_steps < 1001000:
                     q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1{}.h5".format(reward_name, cumulus_steps))
                     q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2{}.h5".format(reward_name, cumulus_steps))
                     q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1t{}.h5".format(reward_name, cumulus_steps))
@@ -227,7 +234,7 @@ agent_weights = "none"
 
 if not train:
     break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2/normal_neu/mu500634.h5"
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/pybullet_normal_mio_2/mu1000114.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

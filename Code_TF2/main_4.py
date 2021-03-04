@@ -11,8 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = sys.argv[1]
-# reward_fcn_name = "test"
+reward_fcn_name = "pybullet_hip_mio_p14m12p08m10"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -71,9 +70,12 @@ def ddpg(episode, breaking_step, reward_name):
 
     performance = []
     avg_return = []
+    time_step_reward = []
+    avg_time_step_reward = []
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
+        # env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
 
@@ -91,11 +93,11 @@ def ddpg(episode, breaking_step, reward_name):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
+            # action = np.array([1, 0, -1, 0, 1, 0, -1, 0])
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
-            reward_things = env.env.rewards
-            reward = reward_things[0] + reward_things[1] + reward_things[3]   # alive + progress + joint_limit
+            reward = reward + 0.1 * ((next_state[14]) - (next_state[12])) + 0.1 * ((next_state[8]) - (next_state[10]))
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -160,31 +162,34 @@ def ddpg(episode, breaking_step, reward_name):
                     # update the target networks
                     update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, 0.005)
 
+            time_step_reward.append(reward)
+            avg_time_step_reward_short = np.mean(time_step_reward[-25:])
+            avg_time_step_reward.append(avg_time_step_reward_short)
             if done:
                 performance.append(score)
-                avg_reward = np.mean(performance[-10:])
+                avg_reward = np.mean(performance[-25:])
                 avg_return.append(avg_reward)
                 cumulus_steps += i
                 print("episode: {}/{}, score: {}, avg_score: {}, ep_steps: {}, cumulus_steps: {}"
                       .format(e, episode, score, avg_reward, i, cumulus_steps))
 
-                if 500000 < cumulus_steps < 501000:
+                if 50000 < cumulus_steps < 51000 or 150000 < cumulus_steps < 151000 or 350000 < cumulus_steps < 351000 \
+                        or 550000 < cumulus_steps < 551000 or 750000 < cumulus_steps < 751000:
                     if not os.path.exists("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name)):
                         os.mkdir("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}".format(reward_name))
-                    q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/q1{}.h5".format(reward_name, cumulus_steps))
-                    q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/q2{}.h5".format(reward_name, cumulus_steps))
-                    q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/q1t{}.h5".format(reward_name, cumulus_steps))
-                    q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/q2t{}.h5".format(reward_name, cumulus_steps))
-                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                    "Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
-                    mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/"
-                                           "Models/Ant_v2/{}/mut{}.h5".format(reward_name, cumulus_steps))
-                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/"
-                            "Models/Ant_v2/{}/array{}".format(reward_name, cumulus_steps), avg_return)
+                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
+
+                if 1000000 < cumulus_steps < 1001000:
+                    q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1{}.h5".format(reward_name, cumulus_steps))
+                    q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2{}.h5".format(reward_name, cumulus_steps))
+                    q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1t{}.h5".format(reward_name, cumulus_steps))
+                    q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2t{}.h5".format(reward_name, cumulus_steps))
+                    mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
+                    mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mut{}.h5".format(reward_name, cumulus_steps))
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_return{}".format(reward_name, cumulus_steps), avg_return)
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/time_step_reward{}".format(reward_name, cumulus_steps), time_step_reward)
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/performance{}".format(reward_name, cumulus_steps), performance)
+                    np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_time_step_reward{}".format(reward_name, cumulus_steps), avg_time_step_reward)
                 break
 
             score += reward
@@ -194,23 +199,26 @@ def ddpg(episode, breaking_step, reward_name):
         if cumulus_steps > breaking_step:
             break
 
-    return avg_return, mu
+    return avg_return, mu, performance, time_step_reward, avg_time_step_reward
 
 
 def test(mu_render, e, train_bool, weight_string):
-    env = gym.make("Ant-v2")
+    env = gym.make('AntPyBulletEnv-v0')
     if not train_bool:
         mu_render.load_weights(weight_string)
 
     for i in range(e):
-        observation = env.reset()
-        state = tf.convert_to_tensor([observation], dtype=tf.float32)
         done = 0
         ep_reward = 0
         step = 0
+        env.render()
+        observation = env.reset()
+        state = tf.convert_to_tensor([observation], dtype=tf.float32)
         while not done:
-            env.render()
             action = mu_render(state)
+            proto_tensor = tf.make_tensor_proto(action)
+            action = tf.make_ndarray(proto_tensor)
+            action = action[0]
             next_state, reward, done, _ = env.step(action)
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
             ep_reward += reward
@@ -221,26 +229,36 @@ def test(mu_render, e, train_bool, weight_string):
 
 # main starts
 train = True
-break_step = 502000
+break_step = 1002000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/default_r/mu_5497.h5"
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/pybullet_normal_mio_2/mu1000114.h5"
 
 episodes = 500000
-overall_performance, mu = ddpg(episodes, break_step, reward_fcn_name)
+overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)
 
 # plot performance
 if train:
-    plt.plot(range(len(overall_performance)), overall_performance, 'b')
-    plt.title("Avg Test Reward Vs Test Episodes")
-    plt.xlabel("Test Episodes")
-    plt.ylabel("Average Test Reward")
+    fig, ax = plt.subplots()
+    ax.plot(range(len(overall_performance)), overall_performance, color='r')
+    ax.plot(range(len(per)), per, 'b')
+    plt.xlabel("Episodes")
+    plt.ylabel("Performance")
     plt.grid(True)
     # plt.show()
-    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/"
-                "Models/Ant_v2/{}/figure.pdf".format(reward_fcn_name), bbox_inches='tight')
+    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/figure1.pdf".format(reward_fcn_name),
+                bbox_inches='tight')
+    fig2, ax2 = plt.subplots()
+    ax2.plot(range(len(time_step_rew)), time_step_rew, color='y')
+    ax2.plot(range(len(avg_time_step_rew)), avg_time_step_rew, 'b')
+    plt.xlabel("Time Steps")
+    plt.ylabel("Performance")
+    plt.grid(True)
+    # plt.show()
+    plt.savefig("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/figure2.pdf".format(reward_fcn_name),
+                bbox_inches='tight')
 
 # test and render
 eps = 20

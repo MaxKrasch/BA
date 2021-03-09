@@ -232,14 +232,14 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = True
+train = False
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/" \
-                    "pybullet_hip_mio_p14m10m08m12/mu350684.h5"
+                    "pb_front_back_tight_mcosts_reverse/mu750816.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

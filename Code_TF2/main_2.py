@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_front_back_tight_mcosts_reverse"
+reward_fcn_name = "pb1_ground_only_time"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -97,7 +97,17 @@ def ddpg(episode, breaking_step, reward_name):
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
             reward_list = env.env.rewards
-            reward = reward - 0.1 * ((1-next_state[20])+(1+next_state[8])+(1-next_state[12])+(1+next_state[16])) - reward_list[3]
+            first_count = 1
+            second_count = 1
+
+            if (next_state[26] == 1 and next_state[25] == 1 and next_state[24] == 0 and next_state[27] == 0) \
+               or (next_state[24] == 1 and next_state[27] == 1 and next_state[26] == 0 and next_state[25] == 0) \
+               or (next_state[24] == 0 and next_state[27] == 0 and next_state[26] == 0 and next_state[25] == 0):
+                penalty = 0
+            else:
+                penalty = 1
+
+            reward = reward - 0.1 * penalty
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

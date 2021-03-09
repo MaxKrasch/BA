@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_front_back_tight_mcosts"
+reward_fcn_name = "pb1_ground_only_fly"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -75,7 +75,7 @@ def ddpg(episode, breaking_step, reward_name):
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
-        # env.render()
+        env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
 
@@ -97,7 +97,17 @@ def ddpg(episode, breaking_step, reward_name):
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
             reward_list = env.env.rewards
-            reward = reward + 0.1 * (next_state[20] - next_state[8] + next_state[12] - next_state[16]) - reward_list[3]
+
+            if next_state[26] == 1 and next_state[25] == 1 and next_state[24] == 0 and next_state[27] == 0:
+                penalty = -1
+            elif next_state[24] == 1 and next_state[27] == 1 and next_state[26] == 0 and next_state[25] == 0:
+                penalty = -1
+            elif next_state[24] == 0 and next_state[27] == 0 and next_state[26] == 0 and next_state[25] == 0:
+                penalty = -5
+            else:
+                penalty = 0
+
+            reward = reward - 0.1 * penalty
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -232,14 +242,14 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = False
+train = True
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/" \
-                    "pb_front_back_tight_mcosts_reverse/mu750816.h5"
+                    "pybullet_hip_mio_p14m10m08m12/mu350684.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

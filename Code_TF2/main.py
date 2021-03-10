@@ -75,7 +75,7 @@ def ddpg(episode, breaking_step, reward_name):
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
-        env.render()
+        # env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
 

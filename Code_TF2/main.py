@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb1_ground_only_fly"
+reward_fcn_name = "pb2_pzpos"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -97,17 +97,8 @@ def ddpg(episode, breaking_step, reward_name):
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
             reward_list = env.env.rewards
-
-            if next_state[26] == 1 and next_state[25] == 1 and next_state[24] == 0 and next_state[27] == 0:
-                penalty = -1
-            elif next_state[24] == 1 and next_state[27] == 1 and next_state[26] == 0 and next_state[25] == 0:
-                penalty = -1
-            elif next_state[24] == 0 and next_state[27] == 0 and next_state[26] == 0 and next_state[25] == 0:
-                penalty = -5
-            else:
-                penalty = 0
-
-            reward = reward - 0.1 * penalty
+            z_pos = env.env.robot.body_xyz[2]
+            reward = reward + 0.1 * z_pos
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -249,7 +240,7 @@ agent_weights = "none"
 if not train:
     break_step = 2000
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/" \
-                    "pybullet_hip_mio_p14m10m08m12/mu350684.h5"
+                    "pb1_ground_only_simple/mu1000109.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

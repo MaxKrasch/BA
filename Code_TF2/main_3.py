@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb2_front_back_tight"
+reward_fcn_name = "pb3_pzpos_linear"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -97,7 +97,9 @@ def ddpg(episode, breaking_step, reward_name):
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
             reward_list = env.env.rewards
-            reward = reward + 0.1 * (next_state[20] - next_state[8] + next_state[12] - next_state[16])
+            z_pos = env.env.robot.body_xyz[2]
+            fwp = reward_list[1]
+            reward = reward + np.absolute(fwp * z_pos)
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

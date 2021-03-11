@@ -101,7 +101,6 @@ def ddpg(episode, breaking_step, reward_name):
             fwp = reward_list[1]
             if fwp > 0:
                 reward = reward + fwp * z_pos
-                print(fwp, fwp * z_pos, z_pos)
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

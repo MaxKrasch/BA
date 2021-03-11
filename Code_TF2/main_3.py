@@ -99,7 +99,9 @@ def ddpg(episode, breaking_step, reward_name):
             reward_list = env.env.rewards
             z_pos = env.env.robot.body_xyz[2]
             fwp = reward_list[1]
-            reward = reward + np.absolute(fwp * z_pos)
+            if fwp > 0:
+                reward = reward + fwp * z_pos
+                print(fwp, fwp * z_pos, z_pos)
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

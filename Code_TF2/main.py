@@ -229,12 +229,7 @@ def ddpg(episode, breaking_step, reward_name):
 
                 if 1000000 < cumulus_steps < 1001000 and f_c == 0:
                     f_c = 1
-                    # q1.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1{}.h5".format(reward_name, cumulus_steps))
-                    # q2.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2{}.h5".format(reward_name, cumulus_steps))
-                    # q1_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q1t{}.h5".format(reward_name, cumulus_steps))
-                    # q2_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/q2t{}.h5".format(reward_name, cumulus_steps))
                     mu.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
-                    # mu_target.save_weights("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mut{}.h5".format(reward_name, cumulus_steps))
                     np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_return{}".format(reward_name, cumulus_steps), avg_return)
                     np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/time_step_reward{}".format(reward_name, cumulus_steps), time_step_reward)
                     np.save("/home/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/performance{}".format(reward_name, cumulus_steps), performance)

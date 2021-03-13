@@ -291,7 +291,7 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = False
+train = True
 break_step = 1002000
 agent_weights = "none"
 

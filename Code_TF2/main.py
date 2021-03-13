@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb3_pzpos_only"
+reward_fcn_name = "normal_bestatigung"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -102,9 +102,6 @@ def ddpg(episode, breaking_step, reward_name):
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
-            reward_list = env.env.rewards
-            z_pos = env.env.robot.body_xyz[2]
-            reward = z_pos
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -276,6 +273,9 @@ def test(mu_render, e, train_bool, weight_string):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
+            # action[2] = 0
+            # action[3] = 0
+            # print(action)
             next_state, reward, done, _ = env.step(action)
             reward_list = env.env.rewards
             reward = reward_list[1]
@@ -297,8 +297,8 @@ agent_weights = "none"
 
 if not train:
     break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_Luca_Rep/BA/Models/Ant_v2/" \
-                    "pb3b_walk_only_back/mu750140.h5"
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullet/" \
+                    "pb3b_pzpos_linear/mu550998.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_hopper_bes0"
+reward_fcn_name = "pb_hopper_bes1"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):

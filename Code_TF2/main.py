@@ -286,14 +286,14 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = True
+train = False
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullet/" \
-                    "pb3_pzpos_linear_bestatigung/mu1000670.h5"
+                    "pb_normal_bes1/mu550640.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

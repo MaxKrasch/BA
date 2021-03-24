@@ -81,7 +81,7 @@ def ddpg(episode, breaking_step, reward_name):
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
-        # env.render()
+        env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
 
@@ -286,14 +286,14 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = False
+train = True
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
     break_step = 2000
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullet/" \
-                    "pb_normal_bes1/mu550640.h5"
+                    "pb_hopper_bes1/mu550867.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

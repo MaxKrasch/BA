@@ -292,8 +292,7 @@ agent_weights = "none"
 
 if not train:
     break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullet/" \
-                    "pb_tight_prove_0/mu1000768.h5"
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullt/pb_tight_prove_1/mu1000346.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

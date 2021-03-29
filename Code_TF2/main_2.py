@@ -109,8 +109,7 @@ def ddpg(episode, breaking_step, reward_name):
             if not next_state[25] and not next_state[26] and next_state[27] and next_state[24]:
                 penalty = -1
 
-            reward = reward - 0.1 * penalty - 0.1 * ((1 - next_state[20]) + (1 + next_state[8]) +
-                                                     (1 - next_state[12]) + (1 + next_state[16]))
+            reward = reward - 0.1 * penalty
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

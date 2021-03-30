@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_horse_prove_2"
+reward_fcn_name = "pb_horse_test"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -95,10 +95,13 @@ def ddpg(episode, breaking_step, reward_name):
 
             # select an action a_t = mu(state) + noise
             noise = NormalActionNoise(0, 0.1)
-            action = mu(state) + np.random.normal(noise.mean, noise.sigma)
-            proto_tensor = tf.make_tensor_proto(action)
-            action = tf.make_ndarray(proto_tensor)
-            action = action[0]
+            if cumulus_steps < 900:
+                action = env.action_space.sample()
+            else:
+                action = mu(state) + np.random.normal(noise.mean, noise.sigma)
+                proto_tensor = tf.make_tensor_proto(action)
+                action = tf.make_ndarray(proto_tensor)
+                action = action[0]
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
@@ -109,7 +112,7 @@ def ddpg(episode, breaking_step, reward_name):
             if not next_state[25] and not next_state[26] and next_state[27] and next_state[24]:
                 penalty = -1
 
-            reward = reward - 0.1 * penalty
+            reward = reward - 0.2 * penalty
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -258,7 +261,12 @@ def test(mu_render, e, train_bool, weight_string):
     env = gym.make('AntPyBulletEnv-v0')
     if not train_bool:
         mu_render.load_weights(weight_string)
-
+    final_x_list = []
+    forward_return_list = []
+    electricity_list = []
+    joint_lim_list = []
+    z_pos_list = []
+    cumulus_steps_list = []
     for i in range(e):
         done = 0
         ep_reward = 0
@@ -266,12 +274,13 @@ def test(mu_render, e, train_bool, weight_string):
         env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
-        a = 0
-        b = 0
-        c = 0
-        d = 0
-        z = 0
+        final_x_pos = 0
+        episode_electricity_costs = 0
+        episode_jointlim_costs = 0
+        episode_alive = 0
+        z_ep_list = []
         while not done:
+            z_ep_list = []
             action = mu_render(state)
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
@@ -280,17 +289,38 @@ def test(mu_render, e, train_bool, weight_string):
             # action[3] = 0
             # print(action)
             next_state, reward, done, _ = env.step(action)
+            # print(next_state[24], next_state[27], next_state[25], next_state[26])
             reward_list = env.env.rewards
             reward = reward_list[1]
-            # z_pos = env.env.robot.body_xyz[2]
-            # z += z_pos
-            # print(reward_list[1], z_pos)
+            # print(next_state[6], next_state[7])
+            z_pos = env.env.robot.body_xyz[2]
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
             ep_reward += reward
             step += 1
-        print(ep_reward)
-        # print(z/1000)
-        print(step)
+            final_x_pos = env.env.robot.body_xyz[0]
+            episode_electricity_costs += reward_list[2]
+            episode_jointlim_costs += reward_list[3]
+            episode_alive += reward_list[0]
+            z_ep_list.append(z_pos)
+        print("Final x position: {}".format(final_x_pos))
+        final_x_list.append(final_x_pos)
+        print("Episode forward return: {}".format(ep_reward))
+        forward_return_list.append(ep_reward)
+        print("Electricity costs: {}".format(episode_electricity_costs))
+        electricity_list.append(episode_electricity_costs)
+        print("Joints at limits costs: {}".format(episode_jointlim_costs))
+        joint_lim_list.append(episode_jointlim_costs)
+        print("Average z position: {}".format(np.mean(z_ep_list)))
+        z_pos_list.append(np.mean(z_ep_list))
+        print("cumulus steps: {}".format(step))
+        cumulus_steps_list.append(step)
+    print("Mean final x position: {}".format(np.mean(final_x_list)))
+    print("Mean episode forward return: {}".format(np.mean(forward_return_list)))
+    print("Mean episode electricity costs: {}".format(np.mean(electricity_list)))
+    print("Mean joint limit costs: {}".format(np.mean(joint_lim_list)))
+    print("Mean episodes mean z pos: {}".format(np.mean(z_pos_list)))
+    print("Mean cumulus steps: {}".format(np.mean(cumulus_steps_list)))
+
 
 
 # main starts
@@ -299,9 +329,9 @@ break_step = 1002000
 agent_weights = "none"
 
 if not train:
-    break_step = 2000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullet/" \
-                    "pb_normal_prove_0/mu1000177.h5"
+    break_step = 1000
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullt" \
+                    "/pb_pzpos_linear_prove_1/mu1000104.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

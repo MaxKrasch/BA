@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_pzpos_linear_prove_3"
+reward_fcn_name = "pb_broken"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -95,18 +95,18 @@ def ddpg(episode, breaking_step, reward_name):
 
             # select an action a_t = mu(state) + noise
             noise = NormalActionNoise(0, 0.1)
-            action = mu(state) + np.random.normal(noise.mean, noise.sigma)
-            proto_tensor = tf.make_tensor_proto(action)
-            action = tf.make_ndarray(proto_tensor)
-            action = action[0]
+            if cumulus_steps < 900:
+                action = env.action_space.sample()
+            else:
+                action = mu(state) + np.random.normal(noise.mean, noise.sigma)
+                proto_tensor = tf.make_tensor_proto(action)
+                action = tf.make_ndarray(proto_tensor)
+                action = action[0]
 
             # execute action a_t and observe reward, and next state
+            action[2] = 0
+            action[3] = 0
             next_state, reward, done, _ = env.step(action)
-            reward_list = env.env.rewards
-            z_pos = env.env.robot.body_xyz[2]
-            fwp = reward_list[1]
-            if fwp > 0:
-                reward = reward + fwp * z_pos
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)

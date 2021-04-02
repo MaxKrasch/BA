@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_tight_prove_2"
+reward_fcn_name = "pb_pzpos_no_discount_prove_2"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -95,14 +95,18 @@ def ddpg(episode, breaking_step, reward_name):
 
             # select an action a_t = mu(state) + noise
             noise = NormalActionNoise(0, 0.1)
-            action = mu(state) + np.random.normal(noise.mean, noise.sigma)
-            proto_tensor = tf.make_tensor_proto(action)
-            action = tf.make_ndarray(proto_tensor)
-            action = action[0]
+            if cumulus_steps < 900:
+                action = env.action_space.sample()
+            else:
+                action = mu(state) + np.random.normal(noise.mean, noise.sigma)
+                proto_tensor = tf.make_tensor_proto(action)
+                action = tf.make_ndarray(proto_tensor)
+                action = action[0]
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
-            reward = reward - 0.1 * ((1 - next_state[20]) + (1 + next_state[8]) + (1 - next_state[12]) + (1 + next_state[16]))
+            z_pos = env.env.robot.body_xyz[2]
+            reward = reward + z_pos
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -292,9 +296,9 @@ break_step = 1002000
 agent_weights = "none"
 
 if not train:
-    break_step = 2000
+    break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullet/" \
-                    "pb_normal_prove_0/mu1000177.h5"
+                    "pb2_pzpos/mu1000265.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

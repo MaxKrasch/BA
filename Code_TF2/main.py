@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_normal_prove_3"
+reward_fcn_name = "pb_tight_prove_3"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -95,13 +95,17 @@ def ddpg(episode, breaking_step, reward_name):
 
             # select an action a_t = mu(state) + noise
             noise = NormalActionNoise(0, 0.1)
-            action = mu(state) + np.random.normal(noise.mean, noise.sigma)
-            proto_tensor = tf.make_tensor_proto(action)
-            action = tf.make_ndarray(proto_tensor)
-            action = action[0]
+            if cumulus_steps < 900:
+                action = env.action_space.sample()
+            else:
+                action = mu(state) + np.random.normal(noise.mean, noise.sigma)
+                proto_tensor = tf.make_tensor_proto(action)
+                action = tf.make_ndarray(proto_tensor)
+                action = action[0]
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
+            reward = reward - 0.1 * ((1 - next_state[20]) + (1 + next_state[8]) + (1 - next_state[12]) + (1 + next_state[16]))
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -274,8 +278,8 @@ def test(mu_render, e, train_bool, weight_string):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
-            # action[2] = 0
-            # action[3] = 0
+            # action[4] = 0
+            # action[5] = 0
             # print(action)
             next_state, reward, done, _ = env.step(action)
             # print(next_state[24], next_state[27], next_state[25], next_state[26])
@@ -311,16 +315,15 @@ def test(mu_render, e, train_bool, weight_string):
     print("Mean cumulus steps: {}".format(np.mean(cumulus_steps_list)))
 
 
-
 # main starts
 train = True
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
-    break_step = 1000
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullt" \
-                    "/pb_pzpos_linear_prove_1/mu1000104.h5"
+    break_step = 100
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
+                    "/hopper_walk/pb1_ground_only_simple/mu750356.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)
@@ -329,7 +332,7 @@ overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, 
 if train:
     fig, ax = plt.subplots()
     ax.plot(range(len(overall_performance)), overall_performance, color='r')
-    ax.plot(range(len(per)), per, 'b')
+    ax.plot(range(len(per)), per, 'b', alpha=0.5)
     plt.xlabel("Episodes")
     plt.ylabel("Performance")
     plt.grid(True)

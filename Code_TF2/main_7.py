@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_horse_test"
+reward_fcn_name = "pb_horse_02_remember"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -108,9 +108,13 @@ def ddpg(episode, breaking_step, reward_name):
             penalty = 0
             if not next_state[24] and not next_state[27] and next_state[25] and next_state[26]:
                 penalty = -1
+                if not state[24] and not state[27] and not state[25] and not state[26]:
+                    penalty = -8
 
             if not next_state[25] and not next_state[26] and next_state[27] and next_state[24]:
                 penalty = -1
+                if not state[24] and not state[27] and not state[25] and not state[26]:
+                    penalty = -8
 
             reward = reward - 0.2 * penalty
 
@@ -320,7 +324,6 @@ def test(mu_render, e, train_bool, weight_string):
     print("Mean joint limit costs: {}".format(np.mean(joint_lim_list)))
     print("Mean episodes mean z pos: {}".format(np.mean(z_pos_list)))
     print("Mean cumulus steps: {}".format(np.mean(cumulus_steps_list)))
-
 
 
 # main starts

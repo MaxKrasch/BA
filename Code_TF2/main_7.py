@@ -78,12 +78,15 @@ def ddpg(episode, breaking_step, reward_name):
     d_c = 0
     e_c = 0
     f_c = 0
+    pen_1_cnt = 0
+    pen_2_cnt = 1
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
         # env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
+        tmp_state = state
 
         max_steps = 1000
         min_action = env.action_space.low[0]
@@ -108,13 +111,21 @@ def ddpg(episode, breaking_step, reward_name):
             penalty = 0
             if not next_state[24] and not next_state[27] and next_state[25] and next_state[26]:
                 penalty = -1
-                if not state[24] and not state[27] and not state[25] and not state[26]:
-                    penalty = -8
+                pen_1_cnt += 1
+                print("pen_1_count: ", pen_1_cnt)
+                if not tmp_state[24] and not tmp_state[27] and not tmp_state[25] and not tmp_state[26]:
+                    penalty = -10
+                    pen_2_cnt += 1
+                    print("-----juhu----- pen_2_count increase: ", pen_2_cnt)
 
             if not next_state[25] and not next_state[26] and next_state[27] and next_state[24]:
                 penalty = -1
-                if not state[24] and not state[27] and not state[25] and not state[26]:
-                    penalty = -8
+                pen_1_cnt += 1
+                print("pen_1_count: ", pen_1_cnt)
+                if not tmp_state[24] and not tmp_state[27] and not tmp_state[25] and not tmp_state[26]:
+                    penalty = -10
+                    pen_2_cnt += 1
+                    print("-----juhu----- pen_2_count increase: ", pen_2_cnt)
 
             reward = reward - 0.2 * penalty
 
@@ -243,6 +254,8 @@ def ddpg(episode, breaking_step, reward_name):
                     np.save("/var/tmp/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_time_step_reward{}".format(reward_name, cumulus_steps), avg_time_step_reward)
 
                 if 1000000 < cumulus_steps < 1001000 and f_c == 0:
+                    print("Final pen 1 count: ", pen_1_cnt)
+                    print("Final pen 2 count: ", pen_2_cnt)
                     f_c = 1
                     mu.save_weights("/var/tmp/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
                     np.save("/var/tmp/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_return{}".format(reward_name, cumulus_steps), avg_return)
@@ -253,6 +266,7 @@ def ddpg(episode, breaking_step, reward_name):
 
             score += reward
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
+            tmp_state = next_state
 
         # stop learning after certain time steps
         if cumulus_steps > breaking_step:

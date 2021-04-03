@@ -268,7 +268,7 @@ def test(mu_render, e, train_bool, weight_string):
         done = 0
         ep_reward = 0
         step = 0
-        # env.render()
+        env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
         final_x_pos = 0
@@ -356,7 +356,7 @@ agent_weights = "none"
 if not train:
     break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/three_legged_walk/pb3b_pzpos_linear/mu550998.h5"
+                    "/hopper_walk/pb_horse_02_prove/mu750168.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

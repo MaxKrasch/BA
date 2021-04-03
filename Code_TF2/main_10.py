@@ -11,7 +11,7 @@ import sys
 import os
 import pybulletgym
 
-reward_fcn_name = "pb_normal_prove_3"
+reward_fcn_name = "pb_horse_remember_prove_0"
 
 
 def update_network_parameters(q1, q1_target, q2, q2_target, mu, mu_target, tau):
@@ -78,12 +78,15 @@ def ddpg(episode, breaking_step, reward_name):
     d_c = 0
     e_c = 0
     f_c = 0
+    pen_1_cnt = 0
+    pen_2_cnt = 1
     for e in range(episode):
 
         # receive initial observation state s1 (observation = s1)
         # env.render()
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
+        tmp_state = state
 
         max_steps = 1000
         min_action = env.action_space.low[0]
@@ -95,13 +98,36 @@ def ddpg(episode, breaking_step, reward_name):
 
             # select an action a_t = mu(state) + noise
             noise = NormalActionNoise(0, 0.1)
-            action = mu(state) + np.random.normal(noise.mean, noise.sigma)
-            proto_tensor = tf.make_tensor_proto(action)
-            action = tf.make_ndarray(proto_tensor)
-            action = action[0]
+            if cumulus_steps < 900:
+                action = env.action_space.sample()
+            else:
+                action = mu(state) + np.random.normal(noise.mean, noise.sigma)
+                proto_tensor = tf.make_tensor_proto(action)
+                action = tf.make_ndarray(proto_tensor)
+                action = action[0]
 
             # execute action a_t and observe reward, and next state
             next_state, reward, done, _ = env.step(action)
+            penalty = 0
+            if not next_state[24] and not next_state[27] and next_state[25] and next_state[26]:
+                penalty = -1
+                pen_1_cnt += 1
+                print("pen_1_count: ", pen_1_cnt)
+                if not tmp_state[24] and not tmp_state[27] and not tmp_state[25] and not tmp_state[26]:
+                    penalty = -10
+                    pen_2_cnt += 1
+                    print("-----juhu----- pen_2_count increase: ", pen_2_cnt)
+
+            if not next_state[25] and not next_state[26] and next_state[27] and next_state[24]:
+                penalty = -1
+                pen_1_cnt += 1
+                print("pen_1_count: ", pen_1_cnt)
+                if not tmp_state[24] and not tmp_state[27] and not tmp_state[25] and not tmp_state[26]:
+                    penalty = -10
+                    pen_2_cnt += 1
+                    print("-----juhu----- pen_2_count increase: ", pen_2_cnt)
+
+            reward = reward - 0.2 * penalty
 
             # store transition in replay buffer
             replay_buffer.store_transition(state, action, reward, next_state, done)
@@ -228,6 +254,8 @@ def ddpg(episode, breaking_step, reward_name):
                     np.save("/var/tmp/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_time_step_reward{}".format(reward_name, cumulus_steps), avg_time_step_reward)
 
                 if 1000000 < cumulus_steps < 1001000 and f_c == 0:
+                    print("Final pen 1 count: ", pen_1_cnt)
+                    print("Final pen 2 count: ", pen_2_cnt)
                     f_c = 1
                     mu.save_weights("/var/tmp/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/mu{}.h5".format(reward_name, cumulus_steps))
                     np.save("/var/tmp/ga53cov/Bachelor_Arbeit/BA/Models/Ant_v2/{}/avg_return{}".format(reward_name, cumulus_steps), avg_return)
@@ -238,6 +266,7 @@ def ddpg(episode, breaking_step, reward_name):
 
             score += reward
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
+            tmp_state = next_state
 
         # stop learning after certain time steps
         if cumulus_steps > breaking_step:
@@ -256,14 +285,6 @@ def test(mu_render, e, train_bool, weight_string):
     joint_lim_list = []
     z_pos_list = []
     cumulus_steps_list = []
-    joint_0_list = []
-    joint_1_list = []
-    joint_2_list = []
-    joint_3_list = []
-    joint_4_list = []
-    joint_5_list = []
-    joint_6_list = []
-    joint_7_list = []
     for i in range(e):
         done = 0
         ep_reward = 0
@@ -272,26 +293,18 @@ def test(mu_render, e, train_bool, weight_string):
         observation = env.reset()
         state = tf.convert_to_tensor([observation], dtype=tf.float32)
         final_x_pos = 0
+        episode_electricity_costs = 0
+        episode_jointlim_costs = 0
         episode_alive = 0
-        forward_ep_list = []
-        electricity_ep_list = []
-        jointlim_ep_list = []
         z_ep_list = []
-        joint_0_ep_list = []
-        joint_1_ep_list = []
-        joint_2_ep_list = []
-        joint_3_ep_list = []
-        joint_4_ep_list = []
-        joint_5_ep_list = []
-        joint_6_ep_list = []
-        joint_7_ep_list = []
         while not done:
+            z_ep_list = []
             action = mu_render(state)
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
-            # action[4] = 0
-            # action[5] = 0
+            # action[2] = 0
+            # action[3] = 0
             # print(action)
             next_state, reward, done, _ = env.step(action)
             # print(next_state[24], next_state[27], next_state[25], next_state[26])
@@ -301,62 +314,41 @@ def test(mu_render, e, train_bool, weight_string):
             z_pos = env.env.robot.body_xyz[2]
             state = tf.convert_to_tensor([next_state], dtype=tf.float32)
             ep_reward += reward
-            final_x_pos = env.env.robot.body_xyz[0]
-            episode_alive += reward_list[0]
-            forward_ep_list.append(reward)
-            electricity_ep_list.append(reward_list[2])
-            jointlim_ep_list.append(reward_list[3])
-            z_ep_list.append(z_pos)
-            # print(next_state[8],next_state[10],next_state[12],next_state[14],next_state[16],next_state[18],next_state[20],next_state[22])
-            joint_0_ep_list.append(next_state[8] * 45)
-            joint_1_ep_list.append((next_state[10] + 2) * 35)
-            joint_2_ep_list.append(next_state[12] * 45)
-            joint_3_ep_list.append((next_state[14] - 2) * (-35))
-            joint_4_ep_list.append(next_state[16] * 45)
-            joint_5_ep_list.append((next_state[18] - 2) * (-35))
-            joint_6_ep_list.append(next_state[20] * 45)
-            joint_7_ep_list.append((next_state[22] + 2) * 35)
             step += 1
+            final_x_pos = env.env.robot.body_xyz[0]
+            episode_electricity_costs += reward_list[2]
+            episode_jointlim_costs += reward_list[3]
+            episode_alive += reward_list[0]
+            z_ep_list.append(z_pos)
         print("Final x position: {}".format(final_x_pos))
         final_x_list.append(final_x_pos)
-        print("Episode forward return: {}".format(np.mean(forward_ep_list)))
-        forward_return_list.append(np.mean(forward_ep_list))
-        print("Average Electricity costs: {}".format(np.mean(electricity_ep_list)))
-        electricity_list.append(np.mean(electricity_ep_list))
-        print("Joints at limits costs: {}".format(np.mean(jointlim_ep_list)))
-        joint_lim_list.append(np.mean(jointlim_ep_list))
+        print("Episode forward return: {}".format(ep_reward))
+        forward_return_list.append(ep_reward)
+        print("Electricity costs: {}".format(episode_electricity_costs))
+        electricity_list.append(episode_electricity_costs)
+        print("Joints at limits costs: {}".format(episode_jointlim_costs))
+        joint_lim_list.append(episode_jointlim_costs)
         print("Average z position: {}".format(np.mean(z_ep_list)))
         z_pos_list.append(np.mean(z_ep_list))
         print("cumulus steps: {}".format(step))
         cumulus_steps_list.append(step)
-        # joints
-        joint_0_list.append(np.mean(joint_0_ep_list))
-        joint_1_list.append(np.mean(joint_1_ep_list))
-        joint_2_list.append(np.mean(joint_2_ep_list))
-        joint_3_list.append(np.mean(joint_3_ep_list))
-        joint_4_list.append(np.mean(joint_4_ep_list))
-        joint_5_list.append(np.mean(joint_5_ep_list))
-        joint_6_list.append(np.mean(joint_6_ep_list))
-        joint_7_list.append(np.mean(joint_7_ep_list))
     print("Mean final x position: {}".format(np.mean(final_x_list)))
     print("Mean episode forward return: {}".format(np.mean(forward_return_list)))
     print("Mean episode electricity costs: {}".format(np.mean(electricity_list)))
     print("Mean joint limit costs: {}".format(np.mean(joint_lim_list)))
     print("Mean episodes mean z pos: {}".format(np.mean(z_pos_list)))
     print("Mean cumulus steps: {}".format(np.mean(cumulus_steps_list)))
-    return final_x_list, forward_return_list, electricity_list, joint_lim_list, z_pos_list, cumulus_steps_list, \
-        joint_0_list, joint_1_list, joint_2_list, joint_3_list, joint_4_list, joint_5_list, joint_6_list, joint_7_list
 
 
 # main starts
-train = False
+train = True
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
-    break_step = 100
-    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/positiv_zpos_walk/pb_pzpos_prove_1/mu1000525.h5"
+    break_step = 1000
+    agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/Ant_v2_pybullt" \
+                    "/pb_pzpos_linear_prove_1/mu1000104.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)
@@ -383,106 +375,6 @@ if train:
                 bbox_inches='tight')
 
 # test and render
-eps = 100
-final_x_list1, forward_return_list1, electricity_list1, joint_lim_list1, z_pos_list1, cumulus_steps_list1, \
-  joint_0_list_n, joint_1_list_n, joint_2_list_n, joint_3_list_n, joint_4_list_n, joint_5_list_n, joint_6_list_n, \
-  joint_7_list_n = test(mu, eps, train, agent_weights)
-
-#
-# perf_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_0"
-#                  "/performance1000177.npy")
-# perf_1 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_1"
-#                  "/performance1000532.npy")
-# perf_2 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_2"
-#                  "/performance1000991.npy")
-# perf_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_3"
-#                  "/performance1000730.npy")
-# perf_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_4"
-#                  "/performance1000114.npy")
-# avg_return_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_0"
-#                        "/avg_return1000177.npy")
-# avg_return_1 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_1"
-#                        "/avg_return1000532.npy")
-# avg_return_2 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_2"
-#                        "/avg_return1000991.npy")
-# avg_return_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_3"
-#                        "/avg_return1000730.npy")
-# avg_return_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_4"
-#                        "/avg_return1000114.npy")
-#
-# mean_perf = perf_0
-# mean_avg_return = avg_return_0
-# p = range(len(mean_perf))
-
-# fug, ax = plt.subplots()
-# ax.plot(range(len(mean_perf)), mean_perf, color='r')
-# ax.plot(range(len(mean_avg_return)), mean_avg_return, 'b')
-# x_tick = np.arange(0, 1000000, 100000)
-# plt.xticks(x_tick)
-# plt.xlabel("Episodes")
-# plt.ylabel("Performance")
-# plt.grid(True)
-# plt.show()
-# plt.savefig("/Users/maxi/Desktop/ba_videos/normal_walk/perf_fig.pdf", bbox_inches='tight')
-
-# Walking Style Plots
-fig3, ax3 = plt.subplots()
-ax3.plot(range(len(forward_return_list1)), forward_return_list1, color='b', label="forward")
-ax3.plot(range(len(electricity_list1)), electricity_list1, color='r', label="electricity")
-ax3.plot(range(len(joint_lim_list1)), joint_lim_list1, color='y', label="joint_limit")
-ax3.plot(range(len(z_pos_list1)), z_pos_list1, color='g', label="z_pos")
-plt.yticks(np.arange(-1, 2.5, step=0.5))
-plt.legend(loc="upper right")
-plt.xlabel("Episodes")
-plt.ylabel("Performance")
-plt.grid(True)
-# plt.show()
-plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
-            "/three_legged_walk/pb3b_pzpos_linear/fejz.pdf", bbox_inches='tight')
-
-fig4, ax4 = plt.subplots()
-ax4.plot(range(len(joint_0_list_n)), joint_0_list_n, color='b', label="j_0")
-# ax4.plot(range(len(joint_1_list_n)), joint_1_list_n, color='g', label="j_1")
-ax4.plot(range(len(joint_2_list_n)), joint_2_list_n, color='r', label="j_2")
-# ax4.plot(range(len(joint_3_list_n)), joint_3_list_n, color='c', label="j_3")
-ax4.plot(range(len(joint_4_list_n)), joint_4_list_n, color='m', label="j_4")
-# ax4.plot(range(len(joint_5_list_n)), joint_5_list_n, color='y', label="j_5")
-ax4.plot(range(len(joint_6_list_n)), joint_6_list_n, color='lime', label="j_6")
-# ax4.plot(range(len(joint_7_list_n)), joint_7_list_n, color='grey', label="j_7")
-plt.yticks(np.arange(-45, 45, step=15))
-plt.legend(loc="upper right")
-plt.xlabel("Episodes")
-plt.ylabel("Average Joint Angles")
-plt.grid(True)
-# plt.show()
-plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
-            "/three_legged_walk/pb3b_pzpos_linear/joints_gerade.pdf", bbox_inches='tight')
-
-fig5, ax5 = plt.subplots()
-# ax5.plot(range(len(joint_0_list_n)), joint_0_list_n, color='b', label="j_0")
-ax5.plot(range(len(joint_1_list_n)), joint_1_list_n, color='g', label="j_1")
-# ax5.plot(range(len(joint_2_list_n)), joint_2_list_n, color='r', label="j_2")
-ax5.plot(range(len(joint_3_list_n)), joint_3_list_n, color='c', label="j_3")
-# ax5.plot(range(len(joint_4_list_n)), joint_4_list_n, color='m', label="j_4")
-ax5.plot(range(len(joint_5_list_n)), joint_5_list_n, color='y', label="j_5")
-# ax5.plot(range(len(joint_6_list_n)), joint_6_list_n, color='lime', label="j_6")
-ax5.plot(range(len(joint_7_list_n)), joint_7_list_n, color='grey', label="j_7")
-plt.yticks(np.arange(-45, 45, step=15))
-plt.legend(loc="upper right")
-plt.xlabel("Episodes")
-plt.ylabel("Average Joint Angles")
-plt.grid(True)
-# plt.show()
-plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
-            "/three_legged_walk/pb3b_pzpos_linear/joints_ungerade.pdf", bbox_inches='tight')
-
-print("Mean joint 0: ", np.mean(joint_0_list_n))
-print("Mean joint 1: ", np.mean(joint_1_list_n))
-print("Mean joint 2: ", np.mean(joint_2_list_n))
-print("Mean joint 3: ", np.mean(joint_3_list_n))
-print("Mean joint 4: ", np.mean(joint_4_list_n))
-print("Mean joint 5: ", np.mean(joint_5_list_n))
-print("Mean joint 6: ", np.mean(joint_6_list_n))
-print("Mean joint 7: ", np.mean(joint_7_list_n))
-
-print("finished")
+eps = 20
+if not train:
+    test(mu, eps, train, agent_weights)

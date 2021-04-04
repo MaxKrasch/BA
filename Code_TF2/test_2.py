@@ -278,6 +278,7 @@ def test(mu_render, e, train_bool, weight_string):
     joint_7_std_list = []
     std_time = 0.5
     for i in range(e):
+        print(i)
         done = 0
         ep_reward = 0
         step = 0
@@ -381,10 +382,15 @@ train = False
 break_step = 1002000
 agent_weights = "none"
 
+walking_type = "normal_walk"
+model_name = "pb_normal_prove_4"
+mu_rendering = "mu1000114.h5"
+model_count = "_4"
+
 if not train:
     break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/positiv_zpos_walk/pb_pzpos_prove_1/mu1000525.h5"
+                    "/{}/{}/{}".format(walking_type, model_name, mu_rendering)
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)
@@ -419,44 +425,83 @@ final_x_list1, forward_return_list1, forward_return_std_list1, electricity_list1
   joint_6_list_n, joint_6_std_list_n, \
   joint_7_list_n, joint_7_std_list_n = test(mu, eps, train, agent_weights)
 
-#
-# perf_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_0"
-#                  "/performance1000177.npy")
-# perf_1 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_1"
-#                  "/performance1000532.npy")
-# perf_2 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_2"
-#                  "/performance1000991.npy")
-# perf_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_3"
-#                  "/performance1000730.npy")
-# perf_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_4"
-#                  "/performance1000114.npy")
-# avg_return_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_0"
-#                        "/avg_return1000177.npy")
-# avg_return_1 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_1"
-#                        "/avg_return1000532.npy")
-# avg_return_2 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_2"
-#                        "/avg_return1000991.npy")
-# avg_return_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_3"
-#                        "/avg_return1000730.npy")
-# avg_return_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves/normal_walk/pb_normal_prove_4"
-#                        "/avg_return1000114.npy")
-#
-# mean_perf = perf_0
-# mean_avg_return = avg_return_0
-# p = range(len(mean_perf))
+final_x_list1 = np.array(final_x_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/final_x_list{}".format(walking_type, model_count), final_x_list1)
+forward_return_list1 = np.array(forward_return_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/forward_return_list{}".format(walking_type, model_count), forward_return_list1)
+forward_return_std_list1 = np.array(forward_return_std_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/forward_return_std_list{}".format(walking_type, model_count), forward_return_std_list1)
+electricity_list1 = np.array(electricity_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/electricity_list{}".format(walking_type, model_count), electricity_list1)
+electricity_std_list1 = np.array(electricity_std_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/electricity_std_list{}".format(walking_type, model_count), electricity_std_list1)
+joint_lim_list1 = np.array(joint_lim_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_lim_list{}".format(walking_type, model_count), joint_lim_list1)
+joint_lim_std_list1 = np.array(joint_lim_std_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_lim_std_list{}".format(walking_type, model_count), joint_lim_std_list1)
+z_pos_list1 = np.array(z_pos_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/z_pos_list{}".format(walking_type, model_count), z_pos_list1)
+z_pos_std_list1 = np.array(z_pos_std_list1)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/z_pos_std_list{}".format(walking_type, model_count), z_pos_std_list1)
+joint_0_list_n = np.array(joint_0_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_0_list{}".format(walking_type, model_count), joint_0_list_n)
+joint_0_std_list_n = np.array(joint_0_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_0_std_list{}".format(walking_type, model_count), joint_0_std_list_n)
+joint_1_list_n = np.array(joint_1_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_1_list{}".format(walking_type, model_count), joint_1_list_n)
+joint_1_std_list_n = np.array(joint_1_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_1_std_list{}".format(walking_type, model_count), joint_1_std_list_n)
+joint_2_list_n = np.array(joint_2_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_2_list{}".format(walking_type, model_count), joint_2_list_n)
+joint_2_std_list_n = np.array(joint_2_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_2_std_list{}".format(walking_type, model_count), joint_2_std_list_n)
+joint_3_list_n = np.array(joint_3_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_3_list{}".format(walking_type, model_count), joint_3_list_n)
+joint_3_std_list_n = np.array(joint_3_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_3_std_list{}".format(walking_type, model_count), joint_3_std_list_n)
+joint_4_list_n = np.array(joint_4_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_4_list{}".format(walking_type, model_count), joint_4_list_n)
+joint_4_std_list_n = np.array(joint_4_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_4_std_list{}".format(walking_type, model_count), joint_4_std_list_n)
+joint_5_list_n = np.array(joint_5_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_5_list{}".format(walking_type, model_count), joint_5_list_n)
+joint_5_std_list_n = np.array(joint_5_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_5_std_list{}".format(walking_type, model_count), joint_5_std_list_n)
+joint_6_list_n = np.array(joint_6_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_6_list{}".format(walking_type, model_count), joint_6_list_n)
+joint_6_std_list_n = np.array(joint_6_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_6_std_list{}".format(walking_type, model_count), joint_6_std_list_n)
+joint_7_list_n = np.array(joint_7_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_7_list{}".format(walking_type, model_count), joint_7_list_n)
+joint_7_std_list_n = np.array(joint_7_std_list_n)
+np.save("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models"
+        "/proves/{}/np_arrays/joint_7_std_list{}".format(walking_type, model_count), joint_7_std_list_n)
 
-# fug, ax = plt.subplots()
-# ax.plot(range(len(mean_perf)), mean_perf, color='r')
-# ax.plot(range(len(mean_avg_return)), mean_avg_return, 'b')
-# x_tick = np.arange(0, 1000000, 100000)
-# plt.xticks(x_tick)
-# plt.xlabel("Episodes")
-# plt.ylabel("Performance")
-# plt.grid(True)
-# plt.show()
-# plt.savefig("/Users/maxi/Desktop/ba_videos/normal_walk/perf_fig.pdf", bbox_inches='tight')
-
-# Walking Style Plots
+# a Walking Style Plots -- fejz 0 std; joints 0.5 std
 fig3, ax3 = plt.subplots()
 f_tmp = np.array(forward_return_list1)
 f_tmp_std = np.array(forward_return_std_list1)
@@ -497,7 +542,7 @@ plt.ylabel("Performance")
 plt.grid(True)
 # plt.show()
 plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
-            "/three_legged_walk/pb3b_pzpos_linear/fejz.pdf", bbox_inches='tight')
+            "/{}/{}/a_fejz.pdf".format(walking_type, model_name), bbox_inches='tight')
 
 fig4, ax4 = plt.subplots()
 j = np.array(joint_0_list_n)
@@ -543,7 +588,7 @@ plt.ylabel("Average Joint Angles")
 plt.grid(True)
 # plt.show()
 plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
-            "/three_legged_walk/pb3b_pzpos_linear/joints_gerade.pdf", bbox_inches='tight')
+            "/{}/{}/a_joints_gerade_half.pdf".format(walking_type, model_name), bbox_inches='tight')
 
 fig5, ax5 = plt.subplots()
 # ax5.plot(range(len(joint_0_list_n)), joint_0_list_n, color='b', label="j_0")
@@ -589,7 +634,144 @@ plt.ylabel("Average Joint Angles")
 plt.grid(True)
 # plt.show()
 plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
-            "/three_legged_walk/pb3b_pzpos_linear/joints_ungerade.pdf", bbox_inches='tight')
+            "/{}/{}/a_joints_ungerade_half.pdf".format(walking_type, model_name), bbox_inches='tight')
+
+# b walking style plots -- joints 0.5 std
+fig6, ax6 = plt.subplots()
+j = np.array(joint_0_list_n)
+j_std = np.array(0.5*joint_0_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax6.plot(range(len(joint_0_list_n)), joint_0_list_n, color="#187AB2", label="j_0")
+ax6.fill_between(range(len(joint_0_list_n)), j_plus, j_minus, alpha=0.5, facecolor="#187AB2")
+# ax4.plot(range(len(joint_1_list_n)), joint_1_list_n, color='g', label="j_1")
+j = np.array(joint_2_list_n)
+j_std = np.array(0.5*joint_2_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax6.plot(range(len(joint_2_list_n)), joint_2_list_n, color='#D32826', label="j_2")
+ax6.fill_between(range(len(joint_2_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#D32826')
+# ax4.plot(range(len(joint_3_list_n)), joint_3_list_n, color='c', label="j_3")
+j = np.array(joint_4_list_n)
+j_std = np.array(0.5*joint_4_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax6.plot(range(len(joint_4_list_n)), joint_4_list_n, color='#FC800B', label="j_4")
+ax6.fill_between(range(len(joint_4_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#FC800B')
+# ax4.plot(range(len(joint_5_list_n)), joint_5_list_n, color='y', label="j_5")
+j = np.array(joint_6_list_n)
+j_std = np.array(0.5*joint_6_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax6.plot(range(len(joint_6_list_n)), joint_6_list_n, color='#309F2D', label="j_6")
+ax6.fill_between(range(len(joint_6_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#309F2D')
+# ax4.plot(range(len(joint_7_list_n)), joint_7_list_n, color='grey', label="j_7")
+plt.yticks(np.arange(-45, 45, step=15))
+plt.legend(loc="upper right")
+plt.xlabel("Episodes")
+plt.ylabel("Average Joint Angles")
+plt.grid(True)
+# plt.show()
+plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
+            "/{}/{}/b_joints_gerade_quater.pdf".format(walking_type, model_name), bbox_inches='tight')
+
+fig7, ax7 = plt.subplots()
+# ax5.plot(range(len(joint_0_list_n)), joint_0_list_n, color='b', label="j_0")
+j = np.array(joint_1_list_n)
+j_std = np.array(0.5*joint_1_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax7.plot(range(len(joint_1_list_n)), joint_1_list_n, color="#187AB2", label="j_1")
+ax7.fill_between(range(len(joint_1_list_n)), j_plus, j_minus, alpha=0.5, facecolor="#187AB2")
+# ax5.plot(range(len(joint_2_list_n)), joint_2_list_n, color='r', label="j_2")
+j = np.array(joint_3_list_n)
+j_std = np.array(0.5*joint_3_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax7.plot(range(len(joint_3_list_n)), joint_3_list_n, color='#D32826', label="j_3")
+ax7.fill_between(range(len(joint_3_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#D32826')
+# ax5.plot(range(len(joint_4_list_n)), joint_4_list_n, color='m', label="j_4")
+j = np.array(joint_5_list_n)
+j_std = np.array(0.5*joint_5_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax7.plot(range(len(joint_5_list_n)), joint_5_list_n, color='#FC800B', label="j_5")
+ax7.fill_between(range(len(joint_5_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#FC800B')
+# ax5.plot(range(len(joint_6_list_n)), joint_6_list_n, color='lime', label="j_6")
+j = np.array(joint_7_list_n)
+j_std = np.array(0.5*joint_7_std_list_n)
+j_plus = j+j_std
+j_minus = j-j_std
+j_plus = list(j_plus)
+j_minus = list(j_minus)
+ax7.plot(range(len(joint_7_list_n)), joint_7_list_n, color='#309F2D', label="j_7")
+ax7.fill_between(range(len(joint_7_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#309F2D')
+plt.yticks(np.arange(0, 105, step=15))
+plt.legend(loc="upper right")
+plt.xlabel("Episodes")
+plt.ylabel("Average Joint Angles")
+plt.grid(True)
+# plt.show()
+plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
+            "/{}/{}/b_joints_ungerade_quater.pdf".format(walking_type, model_name), bbox_inches='tight')
+
+# c Walking Style Plots -- no std
+fig8, ax8 = plt.subplots()
+ax8.plot(range(len(forward_return_list1)), forward_return_list1, color="#187AB2", label="forward")
+ax8.plot(range(len(electricity_list1)), electricity_list1, color='#D32826', label="electricity")
+ax8.plot(range(len(joint_lim_list1)), joint_lim_list1, color='#FC800B', label="joint_limit")
+ax8.plot(range(len(z_pos_list1)), z_pos_list1, color='#309F2D', label="z_pos")
+plt.yticks(np.arange(-1, 2.5, step=0.5))
+plt.legend(loc="upper right")
+plt.xlabel("Episodes")
+plt.ylabel("Performance")
+plt.grid(True)
+# plt.show()
+plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
+            "/{}/{}/c_fejz_no_std.pdf".format(walking_type, model_name), bbox_inches='tight')
+
+fig9, ax9 = plt.subplots()
+ax9.plot(range(len(joint_0_list_n)), joint_0_list_n, color="#187AB2", label="j_0")
+ax9.plot(range(len(joint_2_list_n)), joint_2_list_n, color='#D32826', label="j_2")
+ax9.plot(range(len(joint_4_list_n)), joint_4_list_n, color='#FC800B', label="j_4")
+ax9.plot(range(len(joint_6_list_n)), joint_6_list_n, color='#309F2D', label="j_6")
+plt.yticks(np.arange(-45, 45, step=15))
+plt.legend(loc="upper right")
+plt.xlabel("Episodes")
+plt.ylabel("Average Joint Angles")
+plt.grid(True)
+# plt.show()
+plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
+            "/{}/{}/c_joints_gerade_no_std.pdf".format(walking_type, model_name), bbox_inches='tight')
+
+fig10, ax10 = plt.subplots()
+ax10.plot(range(len(joint_1_list_n)), joint_1_list_n, color="#187AB2", label="j_1")
+ax10.plot(range(len(joint_3_list_n)), joint_3_list_n, color='#D32826', label="j_3")
+ax10.plot(range(len(joint_5_list_n)), joint_5_list_n, color='#FC800B', label="j_5")
+ax10.plot(range(len(joint_7_list_n)), joint_7_list_n, color='#309F2D', label="j_7")
+plt.yticks(np.arange(0, 105, step=15))
+plt.legend(loc="upper right")
+plt.xlabel("Episodes")
+plt.ylabel("Average Joint Angles")
+plt.grid(True)
+# plt.show()
+plt.savefig("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
+            "/{}/{}/c_joints_ungerade_no_std.pdf".format(walking_type, model_name), bbox_inches='tight')
+
 
 print("Mean joint 0: ", np.mean(joint_0_list_n))
 print("Mean joint 1: ", np.mean(joint_1_list_n))

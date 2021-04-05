@@ -382,9 +382,9 @@ train = False
 break_step = 1002000
 agent_weights = "none"
 
-walking_type = "hopper_walk"
-model_name = "pb_horse_02_remember"
-mu_rendering = "mu1000170.h5"
+walking_type = "positiv_zpos_walk"
+model_name = "pb_pzpos_prove_4"
+mu_rendering = "mu1000584.h5"
 model_count = "_4"
 
 if not train:

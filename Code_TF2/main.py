@@ -278,8 +278,8 @@ def test(mu_render, e, train_bool, weight_string):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
-            # action[4] = 0
-            # action[5] = 0
+            # action[2] = 0
+            # action[3] = 0
             # print(action)
             next_state, reward, done, _ = env.step(action)
             # print(next_state[24], next_state[27], next_state[25], next_state[26])
@@ -316,14 +316,14 @@ def test(mu_render, e, train_bool, weight_string):
 
 
 # main starts
-train = True
+train = False
 break_step = 1002000
 agent_weights = "none"
 
 if not train:
     break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/hopper_walk/pb1_ground_only_simple/mu750356.h5"
+                    "/hopper_walk/pb1_ground_only_simple/mu1000109.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

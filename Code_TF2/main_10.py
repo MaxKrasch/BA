@@ -114,7 +114,7 @@ def ddpg(episode, breaking_step, reward_name):
                 pen_1_cnt += 1
                 print("pen_1_count: ", pen_1_cnt)
                 if not tmp_state[24] and not tmp_state[27] and not tmp_state[25] and not tmp_state[26]:
-                    penalty = -10
+                    penalty = -100
                     pen_2_cnt += 1
                     print("-----juhu----- pen_2_count increase: ", pen_2_cnt)
 
@@ -123,7 +123,7 @@ def ddpg(episode, breaking_step, reward_name):
                 pen_1_cnt += 1
                 print("pen_1_count: ", pen_1_cnt)
                 if not tmp_state[24] and not tmp_state[27] and not tmp_state[25] and not tmp_state[26]:
-                    penalty = -10
+                    penalty = -100
                     pen_2_cnt += 1
                     print("-----juhu----- pen_2_count increase: ", pen_2_cnt)
 

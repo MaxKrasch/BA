@@ -323,7 +323,7 @@ agent_weights = "none"
 if not train:
     break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/hopper_walk/pb1_ground_only_simple/mu1000109.h5"
+                    "/three_legged_walk/pb_pzpos_linear_prove_0/mu550998.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

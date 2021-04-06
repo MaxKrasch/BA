@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 20})
 
-walking_style = "positiv_zpos_walk"
-model_name = "pb_pzpos_prove_4"
-average_return = "avg_return1000584.npy"
-performance = "performance1000584.npy"
+walking_style = "hopper_walk"
+model_name = "pb_horse_prove_4"
+average_return = "avg_return1000312.npy"
+performance = "performance1000312.npy"
 
 # Re plot training with transparent blue
 avg_ret = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"

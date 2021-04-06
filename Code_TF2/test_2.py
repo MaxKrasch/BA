@@ -6,10 +6,12 @@ from keras_networks import ActorNN, CriticNN
 import tensorflow as tf
 from replay_buffer import ReplayBuffer
 from noise import NormalActionNoise
-import matplotlib.pyplot as plt
-import sys
 import os
 import pybulletgym
+import sys
+import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size': 20})
+
 
 reward_fcn_name = "pb_normal_prove_3"
 
@@ -382,9 +384,9 @@ train = False
 break_step = 1002000
 agent_weights = "none"
 
-walking_type = "positiv_zpos_walk"
-model_name = "pb_pzpos_prove_4"
-mu_rendering = "mu1000584.h5"
+walking_type = "hopper_walk"
+model_name = "pb_horse_prove_4"
+mu_rendering = "mu1000312.h5"
 model_count = "_4"
 
 if not train:

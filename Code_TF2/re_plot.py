@@ -4,7 +4,7 @@ plt.rcParams.update({'font.size': 20})
 
 # Walking Style Plots
 
-walking_style = "hopper_walk"
+walking_style = "tight_walk"
 
 electricity_list_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                              "/{}/np_arrays/electricity_list_0.npy".format(walking_style))
@@ -36,6 +36,11 @@ final_x_list_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/prov
                          "/{}/np_arrays/final_x_list_3.npy".format(walking_style))
 final_x_list_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                          "/{}/np_arrays/final_x_list_4.npy".format(walking_style))
+# lel_0 = np.std(final_x_list_0)
+# lel_1 = np.std(final_x_list_1)
+# lel_2 = np.std(final_x_list_2)
+# lel_3 = np.std(final_x_list_3)
+# lel_4 = np.std(final_x_list_4)
 forward_return_list_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                                 "/{}/np_arrays/forward_return_list_0.npy".format(walking_style))
 forward_return_list_1 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"

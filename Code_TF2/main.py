@@ -323,7 +323,7 @@ agent_weights = "none"
 if not train:
     break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/three_legged_walk/pb_pzpos_linear_prove_0/mu550998.h5"
+                    "/tight_walk/pb_tight_prove_0/mu1000768.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)
@@ -350,6 +350,6 @@ if train:
                 bbox_inches='tight')
 
 # test and render
-eps = 20
+eps = 100
 if not train:
     test(mu, eps, train, agent_weights)

@@ -4,7 +4,7 @@ plt.rcParams.update({'font.size': 20})
 
 # Walking Style Plots
 
-walking_style = "tight_walk"
+walking_style = "three_legged_walk"
 
 electricity_list_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                              "/{}/np_arrays/electricity_list_0.npy".format(walking_style))
@@ -36,11 +36,11 @@ final_x_list_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/prov
                          "/{}/np_arrays/final_x_list_3.npy".format(walking_style))
 final_x_list_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                          "/{}/np_arrays/final_x_list_4.npy".format(walking_style))
-# lel_0 = np.std(final_x_list_0)
-# lel_1 = np.std(final_x_list_1)
-# lel_2 = np.std(final_x_list_2)
-# lel_3 = np.std(final_x_list_3)
-# lel_4 = np.std(final_x_list_4)
+lel_0 = np.std(final_x_list_0)
+lel_1 = np.std(final_x_list_1)
+lel_2 = np.std(final_x_list_2)
+lel_3 = np.std(final_x_list_3)
+lel_4 = np.std(final_x_list_4)
 forward_return_list_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                                 "/{}/np_arrays/forward_return_list_0.npy".format(walking_style))
 forward_return_list_1 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
@@ -261,6 +261,23 @@ joint_7_std_list_3 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/
                              "/{}/np_arrays/joint_7_std_list_3.npy".format(walking_style))
 joint_7_std_list_4 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                              "/{}/np_arrays/joint_7_std_list_4.npy".format(walking_style))
+avg_0 = np.mean(joint_0_list_0)
+st_0 = np.std(joint_0_list_0)
+avg_1 = np.mean(joint_1_list_0)
+st_1 = np.std(joint_1_list_0)
+avg_2 = np.mean(joint_2_list_0)
+st_2 = np.std(joint_2_list_0)
+avg_3 = np.mean(joint_3_list_0)
+st_3 = np.std(joint_3_list_0)
+avg_4 = np.mean(joint_4_list_0)
+st_4 = np.std(joint_4_list_0)
+avg_5 = np.mean(joint_5_list_0)
+st_5 = np.std(joint_5_list_0)
+avg_6 = np.mean(joint_6_list_0)
+st_6 = np.std(joint_6_list_0)
+avg_7 = np.mean(joint_7_list_0)
+st_7 = np.std(joint_7_list_0)
+
 
 # means aus den arrays von oben berechnen
 skia = 0

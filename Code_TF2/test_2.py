@@ -384,10 +384,10 @@ train = False
 break_step = 1002000
 agent_weights = "none"
 
-walking_type = "hopper_walk"
-model_name = "pb_horse_prove_4"
-mu_rendering = "mu1000312.h5"
-model_count = "_4"
+walking_type = "tight_walk"
+model_name = "pb_tight_prove_0"
+mu_rendering = "mu1000768.h5"
+model_count = "_0"
 
 if not train:
     break_step = 100
@@ -646,8 +646,8 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax6.plot(range(len(joint_0_list_n)), joint_0_list_n, color="#187AB2", label="j_0")
-ax6.fill_between(range(len(joint_0_list_n)), j_plus, j_minus, alpha=0.5, facecolor="#187AB2")
+ax6.plot(range(len(joint_0_list_n)), joint_0_list_n, color='#FC800B', label="j_0")  # yellow
+ax6.fill_between(range(len(joint_0_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#FC800B')
 # ax4.plot(range(len(joint_1_list_n)), joint_1_list_n, color='g', label="j_1")
 j = np.array(joint_2_list_n)
 j_std = np.array(0.5*joint_2_std_list_n)
@@ -655,7 +655,7 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax6.plot(range(len(joint_2_list_n)), joint_2_list_n, color='#D32826', label="j_2")
+ax6.plot(range(len(joint_2_list_n)), joint_2_list_n, color='#D32826', label="j_2")  # red
 ax6.fill_between(range(len(joint_2_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#D32826')
 # ax4.plot(range(len(joint_3_list_n)), joint_3_list_n, color='c', label="j_3")
 j = np.array(joint_4_list_n)
@@ -664,8 +664,8 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax6.plot(range(len(joint_4_list_n)), joint_4_list_n, color='#FC800B', label="j_4")
-ax6.fill_between(range(len(joint_4_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#FC800B')
+ax6.plot(range(len(joint_4_list_n)), joint_4_list_n, color="#187AB2", label="j_4")  # blue
+ax6.fill_between(range(len(joint_4_list_n)), j_plus, j_minus, alpha=0.5, facecolor="#187AB2")
 # ax4.plot(range(len(joint_5_list_n)), joint_5_list_n, color='y', label="j_5")
 j = np.array(joint_6_list_n)
 j_std = np.array(0.5*joint_6_std_list_n)
@@ -673,7 +673,7 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax6.plot(range(len(joint_6_list_n)), joint_6_list_n, color='#309F2D', label="j_6")
+ax6.plot(range(len(joint_6_list_n)), joint_6_list_n, color='#309F2D', label="j_6")  # green
 ax6.fill_between(range(len(joint_6_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#309F2D')
 # ax4.plot(range(len(joint_7_list_n)), joint_7_list_n, color='grey', label="j_7")
 plt.yticks(np.arange(-45, 45, step=15))
@@ -693,7 +693,7 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax7.plot(range(len(joint_1_list_n)), joint_1_list_n, color="#187AB2", label="j_1")
+ax7.plot(range(len(joint_1_list_n)), joint_1_list_n, color="#187AB2", label="j_1")  # blue
 ax7.fill_between(range(len(joint_1_list_n)), j_plus, j_minus, alpha=0.5, facecolor="#187AB2")
 # ax5.plot(range(len(joint_2_list_n)), joint_2_list_n, color='r', label="j_2")
 j = np.array(joint_3_list_n)
@@ -702,8 +702,8 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax7.plot(range(len(joint_3_list_n)), joint_3_list_n, color='#D32826', label="j_3")
-ax7.fill_between(range(len(joint_3_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#D32826')
+ax7.plot(range(len(joint_3_list_n)), joint_3_list_n, color='#309F2D', label="j_3")  # green
+ax7.fill_between(range(len(joint_3_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#309F2D')
 # ax5.plot(range(len(joint_4_list_n)), joint_4_list_n, color='m', label="j_4")
 j = np.array(joint_5_list_n)
 j_std = np.array(0.5*joint_5_std_list_n)
@@ -711,7 +711,7 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax7.plot(range(len(joint_5_list_n)), joint_5_list_n, color='#FC800B', label="j_5")
+ax7.plot(range(len(joint_5_list_n)), joint_5_list_n, color='#FC800B', label="j_5")  # yellow
 ax7.fill_between(range(len(joint_5_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#FC800B')
 # ax5.plot(range(len(joint_6_list_n)), joint_6_list_n, color='lime', label="j_6")
 j = np.array(joint_7_list_n)
@@ -720,8 +720,8 @@ j_plus = j+j_std
 j_minus = j-j_std
 j_plus = list(j_plus)
 j_minus = list(j_minus)
-ax7.plot(range(len(joint_7_list_n)), joint_7_list_n, color='#309F2D', label="j_7")
-ax7.fill_between(range(len(joint_7_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#309F2D')
+ax7.plot(range(len(joint_7_list_n)), joint_7_list_n, color='#D32826', label="j_7")  # red
+ax7.fill_between(range(len(joint_7_list_n)), j_plus, j_minus, alpha=0.5, facecolor='#D32826')
 plt.yticks(np.arange(0, 105, step=15))
 plt.legend(loc="upper right")
 plt.xlabel("Episodes")

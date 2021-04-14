@@ -4,7 +4,7 @@ plt.rcParams.update({'font.size': 20})
 
 # Walking Style Plots
 
-walking_style = "three_legged_walk"
+walking_style = "normal_walk"
 
 electricity_list_0 = np.load("/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves"
                              "/{}/np_arrays/electricity_list_0.npy".format(walking_style))

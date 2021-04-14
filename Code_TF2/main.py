@@ -159,7 +159,6 @@ def ddpg(episode, breaking_step, reward_name):
                 if learn_count % update_frequency == 0:
                     with tf.GradientTape() as tape:
                         new_policy_actions = mu(states)
-                        # check if - or + (descent or ascent) not sure yet
                         actor_loss = -q1(states, new_policy_actions)
                         actor_loss = tf.math.reduce_mean(actor_loss)
 
@@ -278,8 +277,8 @@ def test(mu_render, e, train_bool, weight_string):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
-            # action[2] = 0
-            # action[3] = 0
+            action[2] = 0
+            action[3] = 0
             # print(action)
             next_state, reward, done, _ = env.step(action)
             # print(next_state[24], next_state[27], next_state[25], next_state[26])
@@ -323,7 +322,7 @@ agent_weights = "none"
 if not train:
     break_step = 100
     agent_weights = "/Users/maxi/Desktop/Bachelor_Arbeit/BA_TUM/Models/proves" \
-                    "/normal_walk/pb_normal_prove_0/mu1000177.h5"
+                    "/three_legged_broken_walk/pb_pzpos_linear_prove_0/mu1000998.h5"
 
 episodes = 500000
 overall_performance, mu, per, time_step_rew, avg_time_step_rew = ddpg(episodes, break_step, reward_fcn_name)

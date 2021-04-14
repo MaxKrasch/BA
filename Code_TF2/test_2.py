@@ -306,8 +306,8 @@ def test(mu_render, e, train_bool, weight_string):
             proto_tensor = tf.make_tensor_proto(action)
             action = tf.make_ndarray(proto_tensor)
             action = action[0]
-            # action[4] = 0
-            # action[5] = 0
+            action[2] = 0
+            action[3] = 0
             # print(action)
             next_state, reward, done, _ = env.step(action)
             # print(next_state[24], next_state[27], next_state[25], next_state[26])
@@ -384,9 +384,9 @@ train = False
 break_step = 1002000
 agent_weights = "none"
 
-walking_type = "tight_walk"
-model_name = "pb_tight_prove_0"
-mu_rendering = "mu1000768.h5"
+walking_type = "three_legged_broken_walk"
+model_name = "pb_pzpos_linear_prove_0"
+mu_rendering = "mu1000998.h5"
 model_count = "_0"
 
 if not train:
